@@ -1,0 +1,85 @@
+## =========================
+## Thème de l’interface
+## light, dark, grey ou auto
+## =========================
+theme: dark  # Ici on utilise le thème sombre
+
+## =========================
+## Configuration serveur
+## =========================
+server:
+  address: 'tcp4://:9091'  # Ecoute sur toutes les interfaces IPv4 sur le port 9091
+
+## =========================
+## Journalisation (Logs)
+## =========================
+log:
+  level: debug                 # Niveau de log (debug pour tout voir, utile en dev)
+  file_path: '/tmp/authelia.log'  # Fichier où seront écrits les logs
+  keep_stdout: true            # Garde aussi les logs dans la console
+
+## =========================
+## TOTP (OTP temps réel)
+## =========================
+totp:
+  disable: true  # Désactive le TOTP, donc pas d’authentification à 2 facteurs ici
+
+## =========================
+## Backend d’authentification
+## =========================
+authentication_backend:
+  file:
+    path: '/config/users.yml'  # Fichier contenant les utilisateurs et mots de passe
+    password:
+      algorithm: 'argon2'     # Algorithme de hachage pour les mots de passe
+      argon2:
+        variant: 'argon2id'   # Variante recommandée
+        iterations: 3         # Nombre d’itérations (à augmenter en prod)
+        memory: 65535         # Mémoire utilisée par l’algorithme (~64MB)
+        parallelism: 4        # Nombre de threads pour Argon2
+        key_length: 32        # Taille de la clé générée
+        salt_length: 16       # Taille du sel
+  password_reset:
+    disable: true
+
+## =========================
+## Contrôle d’accès
+## =========================
+access_control:
+  default_policy: one_factor      # Politique par défaut : un seul facteur requis
+  rules:
+    - domain: authelia.yourdomain.fr
+      policy: one_factor          # Règle spécifique pour ce domaine
+
+## =========================
+## Sessions et cookies
+## =========================
+session:
+  cookies:
+    - domain: 'yourdomain.fr'                # Domaine des cookies
+      authelia_url: 'https://auth.yourdomain.fr'  # URL du serveur d’authentification
+      default_redirection_url: 'https://www.yourdomain.fr'  # Redirection après login
+
+## =========================
+## Régulation / sécurité brute-force
+## =========================
+regulation:
+  max_retries: 4   # Nombre max de tentatives
+  find_time: 120   # Fenêtre pour compter les tentatives (en secondes)
+  ban_time: 300    # Durée du bannissement (en secondes)
+
+## =========================
+## Stockage
+## =========================
+storage:
+  encryption_key: a_very_important_secret  # Clé pour chiffrer les données sensibles
+  local:
+    path: /config/db.sqlite3  # Base de données SQLite locale
+
+## =========================
+## Notifier (notifications)
+## =========================
+notifier:
+  disable_startup_check: false
+  filesystem:
+    filename: /config/emails.txt  # Les notifications sont écrites dans ce fichier

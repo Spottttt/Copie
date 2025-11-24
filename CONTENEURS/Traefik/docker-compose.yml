@@ -1,0 +1,11 @@
+services:
+  traefik:
+    image: "traefik:v3.5"
+    container_name: "traefik"
+    restart: unless-stopped
+    ports:
+      - "444:443"
+      - "8080:8080"
+    volumes:
+      - "/run/user/1000/podman/podman.sock:/run/user/1000/podman/podman.sock:ro"
+      - "./DATAS/:/etc/traefik/"

@@ -1,0 +1,76 @@
+## =========================
+## Paramètres globaux
+## =========================
+global:
+  checkNewVersion: true       # Vérifie automatiquement si une nouvelle version de Traefik est disponible
+  sendAnonymousUsage: false   # N’envoie pas de statistiques d’utilisation anonymes à Traefik
+
+## =========================
+## Configuration transport des serveurs
+## =========================
+serversTransport:
+  insecureSkipVerify: false   # Ne pas ignorer la vérification TLS des serveurs en backend (sécurité activée)
+
+## =========================
+## Dashboard Traefik
+## =========================
+api:
+  dashboard: true             # Active le tableau de bord web de Traefik
+  insecure: true             # Permet l’accès non sécurisé au dashboard (utile en dev, pas en prod !)
+
+## =========================
+## Niveau de logs
+## =========================
+log:
+  level: DEBUG                # Niveau de logs : DEBUG pour tout voir (INFO/ERROR possible pour prod)
+
+## =========================
+## Providers (sources de configuration)
+## =========================
+providers:
+  docker:
+    watch: true                               # Surveille les changements dans Docker/Podman
+    endpoint: "unix:///run/user/1000/podman/podman.sock" # Socket rootless Podman
+    exposedByDefault: false                   # Les conteneurs ne sont pas exposés automatiquement
+  file:
+    filename: /etc/traefik/config.yml        # Fichier YAML supplémentaire pour les règles statiques/dynamiques
+    watch: true                               # Surveille ce fichier pour recharger la config automatiquement
+
+## =========================
+## Points d’entrée (ports)
+## =========================
+entryPoints:
+  web:
+    address: ":80"             # HTTP
+    http:
+      redirections:
+        entryPoint:
+          to: websecure        # Redirige automatiquement vers HTTPS
+          scheme: https
+          permanent: true      # Redirection permanente (301)
+
+  websecure:
+    address: ":443"            # HTTPS
+
+  # minecraft:
+  #   address: ":25565/tcp"   # Exemple de point d’entrée pour Minecraft (commenté)
+
+## =========================
+## Résolveurs de certificats
+## =========================
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "yourmail@gmail.com"          # Email pour Let’s Encrypt
+      storage: "/etc/traefik/ssl/acme.json"      # Fichier où seront stockés les certificats
+      tlsChallenge: {}                           # Utilisation du TLS Challenge pour valider le domaine
+
+## =========================
+## Plugins expérimentaux (commentés)
+## =========================
+# experimental:
+#   plugins:
+#     fail2ban:
+#       moduleName: "github.com/tomMoulard/fail2ban"
+#       version: "v0.8.6"
+#       # Exemple d’activation d’un plugin fail2ban pour Traefik (experimental)

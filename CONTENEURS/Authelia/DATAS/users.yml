@@ -1,0 +1,20 @@
+# yamllint disable rule:line-length
+---
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+### Format et options ###
+# https://www.authelia.com/reference/guides/passwords/
+
+### Commande pour générer un password ###
+# podman run authelia/authelia:latest authelia crypto hash generate argon2 --password 'password'
+
+users:
+  toto:
+    disabled: false
+    displayname: "Toto"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$/bdCfoGlG91UzQbWwQpZaw$un8WAs2hZnq944WW1gGEN7vlmtctRrHYDn79R22xLkE"
+
+...
+# yamllint enable rule:line-length

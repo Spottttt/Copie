@@ -1,0 +1,111 @@
+## =========================
+## TCP
+## =========================
+#tcp:
+#   routers:
+#
+#   services:
+#
+# Note: Ces blocs sont commentés, mais permettent de router du trafic TCP
+
+
+
+## =========================
+## HTTP
+## =========================
+http:
+
+  ## =========================
+  ## Routers
+  ## =========================
+  routers:
+   
+    # Cockpit (GUI serveur)
+    router-cockpit:
+      service: service-cockpit
+      rule: "Host(`cockpit.yourdomain.fr`)"
+      tls:
+        certResolver: "myresolver"
+        domains:
+          - main: "cockpit.yourdomain.fr"
+
+    # Authelia
+    router-authelia:
+      service: service-authelia
+      rule: "Host(`authelia.yourdomain.fr`)"
+      tls:
+        certResolver: "myresolver"
+        domains:
+          - main: "authelia.yourdomain.fr"
+
+    # Default catch-all
+    router-default:
+      service: service-default
+      middlewares:
+        - middleware-authelia-auth
+      rule: "Host(`yourdomain.fr`)"
+      tls:
+        certResolver: "myresolver"
+        domains:
+          - main: "yourdomain.fr"
+
+
+  ## =========================
+  ## Middlewares
+  ## =========================
+  middlewares:
+
+    # Auth basique (optionnel)
+    middleware-basic-auth:
+      basicAuth:
+        users:
+          - "toto:$2y$05$zmk3ZYHJ0UX06tDBkPOF5.x6Il62Pb8kGLBIjDIxlmLMyrBZoVdme"
+
+    # Auth via Authelia
+    middleware-authelia-auth:
+      forwardAuth:
+        address: "http://192.168.0.10:9091/api/verify?rd=https://authelia.yourdomain.fr"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "Remote-User"
+          - "Remote-Groups"
+          - "Remote-Name"
+          - "Remote-Email"
+
+
+  ## =========================
+  ## Services
+  ## =========================
+  services:
+
+    service-cockpit:
+      loadBalancer:
+        servers:
+          - url: "http://host.containers.internal:9090" #Cas de service ROOT
+
+
+    service-authelia:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.0.10:9091"
+
+
+    service-default:
+      loadBalancer:
+        servers:
+          - url: "http://host.containers.internal:9090" #Cas de service ROOT"
+          #on remplacera par Dashy la prochaine fois !
+
+    # service-proxmox:
+    #   loadBalancer:
+    #     passHostHeader: true
+    #     serversTransport: "servertransport-proxmox"
+    #     servers:
+    #       - url: "https://192.168.0.15:8006"
+
+  ## =========================
+  ## serversTransports (optionnel)
+  ## =========================
+  # serversTransports:
+  #   servertransport-proxmox:
+  #     insecureSkipVerify: true  #Cas de contournement pour une IHM Backend en HTTPS auto-signé comme PROXMOX en combinaison avec le service-proxmox au dessus. 
