@@ -38,7 +38,27 @@ http:
         domains:
           - main: "authelia.yourdomain.fr"
 
-    # Default catch-all
+    # Home Assistant
+    router-ha:
+      service: service-ha
+      rule: "Host(`ha.yourdomain.fr`)"
+      tls:
+        certResolver: "myresolver"
+        domains:
+          - main: "ha.yourdomain.fr"
+
+    # Zigbee2MQTT
+    router-z2m:
+      service: service-z2m
+      middlewares:
+        - middleware-authelia-auth
+      rule: "Host(`z2m.yourdomain.fr`)"
+      tls:
+        certResolver: "myresolver"
+        domains:
+          - main: "z2m.yourdomain.fr"
+
+      # Default catch-all
     router-default:
       service: service-default
       middlewares:
@@ -89,6 +109,15 @@ http:
         servers:
           - url: "http://192.168.0.10:9091"
 
+    service-ha:
+      loadBalancer:
+        servers:
+          - url: "http://host.containers.internal:8123"
+
+    service-z2m:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.0.10:8085"
 
     service-default:
       loadBalancer:

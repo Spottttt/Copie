@@ -1,0 +1,19 @@
+services:
+    zigbee2mqtt:
+        container_name: zigbee2mqtt
+        image: koenkk/zigbee2mqtt:latest
+        restart: unless-stopped
+        volumes:
+            - ./DATAS:/app/data
+            - /run/udev:/run/udev:ro
+        ports:
+            # Frontend port
+            - 8085:8080
+        environment:
+            - TZ=Europe/Berlin
+        devices:
+            # Make sure this matched your adapter location
+            - /dev/ttyACM0:/dev/ttyACM0
+        group_add:
+            - keep-groups
+        user: 1000:1000

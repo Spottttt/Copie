@@ -1,0 +1,22 @@
+homeassistant:
+  enabled: true
+  status_topic: homeassistant/status
+  EAST:
+    force_update: true
+  experimental_event_entities: true
+  discovery_topic: homeassistant
+frontend:
+  enabled: true
+mqtt:
+  server: mqtt://192.168.0.10:1883
+  user: utilisateurMqtt
+  password: passwordMqtt
+serial:
+  port: /dev/ttyACM0
+  adapter: ember 
+  baudrate: 230400
+advanced: {}
+device_options: {}
+devices: {}
+version: 4
+ota: {}

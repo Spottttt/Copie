@@ -1,0 +1,14 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1883:1883" #Normal MQTT
+      # - "1884:1884" #MQTT WebSocket
+      # - "8883:8883" #Normal MQTT with SSL
+      # - "8884:8884" #MQTT WebSocker SSL
+    volumes:
+      - ./DATAS/config:/mosquitto/config:rw
+      - ./DATAS/data:/mosquitto/data:rw
+      - ./DATAS/log:/mosquitto/log:rw
+    restart: unless-stopped
